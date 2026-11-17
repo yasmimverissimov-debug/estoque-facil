@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estoque Fácil - Grupo 4</title>
+<style>
+*{box-sizing:border-box;font-family:Arial} body{background:#f2f2f2;margin:0;padding:15px}
+h1{text-align:center;color:#6a1b9a} .card{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 8px #00000020}
+input,button{width:100%;padding:12px;margin:5px 0;border-radius:8px;border:1px solid #ccc;font-size:16px}
+button{background:#6a1b9a;color:#fff;border:none;font-weight:bold}
+.item{background:#f9f9f9;padding:10px;border-radius:10px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}
+.baixo{color:red;font-weight:bold} .ok{color:green;font-weight:bold}
+.btn2{background:#ff5252;padding:8px;width:auto}
+.btn3{background:#2e7d32;padding:8px;width:auto}
+</style>
+</head>
+<body>
+<h1>📦 Estoque Fácil</h1>
+<p style="text-align:center">App para controlar estoque - Grupo 4</p>
+
+<div class="card">
+<h3>Cadastrar Produto</h3>
+<input id="nome" placeholder="Nome do produto">
+<input id="qtd" type="number" placeholder="Quantidade">
+<input id="preco" type="number" placeholder="Preço R$">
+<button onclick="add()">Adicionar Produto</button>
+</div>
+
+<div class="card">
+<input id="busca" placeholder="🔍 Pesquisar produto..." oninput="mostrar()">
+<h3>Produtos: <span id="total">0</span></h3>
+<div id="lista"></div>
+</div>
+
+<script>
+let produtos = JSON.parse(localStorage.getItem('estoque')||'[]');
+function salvar(){localStorage.setItem('estoque',JSON.stringify(produtos));mostrar();}
+function add(){
+let n=nome.value.trim(), q=Number(qtd.value), p=Number(preco.value);
+if(!n||q<=0){alert('Preencha nome e quantidade!');return;}
+produtos.push({n,q,p}); nome.value='';qtd.value='';preco.value='';salvar();
+}
+function mostrar(){
+let b=busca.value.toLowerCase();
+let f=produtos.filter(p=>p.n.toLowerCase().includes(b));
+total.innerText=f.length;
+lista.innerHTML=f.map((p,i)=>{
+let idx=produtos.indexOf(p);
+return `<div class="item"><div><b>${p.n}</b><br>Qtd: <span class="${p.q<=5?'baixo':'ok'}">${p.q}</span> | R$ ${p.p||0}</div><div><button class="btn3" onclick="alt(${idx},1)">+</button><button class="btn3" onclick="alt(${idx},-1)">-</button><button class="btn2" onclick="del(${idx})">X</button></div></div>`
+}).join('') || 'Nenhum produto ainda.';
+}
+function alt(i,v){produtos[i].q+=v; if(produtos[i].q<0)produtos[i].q=0; salvar();}
+function del(i){if(confirm('Excluir?')){produtos.splice(i,1);salvar();}}
+mostrar();
+</script>
+</body>
+</html>
